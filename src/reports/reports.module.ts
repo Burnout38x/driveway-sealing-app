@@ -3,9 +3,10 @@
 import { Module } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { ReportsController } from './reports.controller';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard'; // Import the guard
 
 @Module({
   controllers: [ReportsController],
-  providers: [ReportsService],
+  providers: [ReportsService, JwtAuthGuard], // Provide the JWT Guard here if needed
 })
 export class ReportsModule {}

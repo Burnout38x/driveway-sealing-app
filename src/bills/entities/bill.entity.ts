@@ -1,6 +1,12 @@
 /* eslint-disable prettier/prettier */
 // src/bills/entities/bill.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('bills')
 export class Bill {

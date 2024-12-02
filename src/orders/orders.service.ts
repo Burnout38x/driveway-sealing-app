@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/orders/orders.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -17,35 +17,84 @@ export class OrdersService {
   // Create a new order
   async create(createOrderDto: CreateOrderDto) {
     const order = this.orderRepository.create(createOrderDto);
-    return await this.orderRepository.save(order);
+    const savedOrder = await this.orderRepository.save(order);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Order created successfully',
+      data: savedOrder,
+    };
   }
 
   // Get all orders
   async findAll() {
-    return await this.orderRepository.find();
+    const orders = await this.orderRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Orders retrieved successfully',
+      data: orders,
+    };
   }
 
   // Get an order by ID
   async findOne(id: number) {
-    return await this.orderRepository.findOne({ where: { id } });
+    const order = await this.orderRepository.findOne({ where: { id } });
+    if (!order) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Order not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Order retrieved successfully',
+      data: order,
+    };
   }
 
   // Update an order by ID
   async update(id: number, updateOrderDto: UpdateOrderDto) {
     const order = await this.orderRepository.findOne({ where: { id } });
     if (!order) {
-      throw new Error('Order not found');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Order not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
     Object.assign(order, updateOrderDto);
-    return await this.orderRepository.save(order);
+    const updatedOrder = await this.orderRepository.save(order);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Order updated successfully',
+      data: updatedOrder,
+    };
   }
 
   // Delete an order
   async remove(id: number) {
     const order = await this.orderRepository.findOne({ where: { id } });
     if (!order) {
-      throw new Error('Order not found');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Order not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
-    return await this.orderRepository.remove(order);
+    await this.orderRepository.remove(order);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Order deleted successfully',
+      data: null,
+    };
   }
 }

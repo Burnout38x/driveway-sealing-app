@@ -14,6 +14,7 @@ import { ReportsModule } from './reports/reports.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env'
     }),
     DatabaseModule, // Add the DatabaseModule here
     AuthModule,

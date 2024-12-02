@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/bills/bills.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateBillDto } from './dto/create-bill.dto';
@@ -17,35 +17,84 @@ export class BillsService {
   // Create a new bill
   async create(createBillDto: CreateBillDto) {
     const bill = this.billRepository.create(createBillDto);
-    return await this.billRepository.save(bill);
+    const savedBill = await this.billRepository.save(bill);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Bill created successfully',
+      data: savedBill,
+    };
   }
 
   // Get all bills
   async findAll() {
-    return await this.billRepository.find();
+    const bills = await this.billRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Bills retrieved successfully',
+      data: bills,
+    };
   }
 
   // Get a single bill by ID
   async findOne(id: number) {
-    return await this.billRepository.findOne({ where: { id } });
+    const bill = await this.billRepository.findOne({ where: { id } });
+    if (!bill) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Bill not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Bill retrieved successfully',
+      data: bill,
+    };
   }
 
   // Update a bill's status
   async update(id: number, updateBillDto: UpdateBillDto) {
     const bill = await this.billRepository.findOne({ where: { id } });
     if (!bill) {
-      throw new Error('Bill not found');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Bill not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
     Object.assign(bill, updateBillDto);
-    return await this.billRepository.save(bill);
+    const updatedBill = await this.billRepository.save(bill);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Bill updated successfully',
+      data: updatedBill,
+    };
   }
 
   // Delete a bill
   async remove(id: number) {
     const bill = await this.billRepository.findOne({ where: { id } });
     if (!bill) {
-      throw new Error('Bill not found');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Bill not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
-    return await this.billRepository.remove(bill);
+    await this.billRepository.remove(bill);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Bill deleted successfully',
+      data: null,
+    };
   }
 }

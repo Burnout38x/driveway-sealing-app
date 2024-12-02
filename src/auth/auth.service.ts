@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/auth/auth.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -21,6 +21,19 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const { email, password, name, role } = registerDto;
 
+    // Check if email already exists
+    const existingUser = await this.userRepository.findOne({ where: { email } });
+    if (existingUser) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.CONFLICT,
+          message: 'Email already exists',
+          data: null,
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
     // Hash the password for security
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -31,7 +44,18 @@ export class AuthService {
       role,
     });
 
-    return await this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User registered successfully',
+      data: {
+        id: savedUser.id,
+        email: savedUser.email,
+        name: savedUser.name,
+        role: savedUser.role,
+      },
+    };
   }
 
   // Login Method
@@ -41,13 +65,27 @@ export class AuthService {
     // Find user by email
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'User not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     // Compare password with stored hash
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new Error('Invalid credentials');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Invalid credentials',
+          data: null,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     // Generate JWT Token
@@ -56,12 +94,16 @@ export class AuthService {
 
     // Return user info along with token
     return {
-      access_token: token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name, // Include name in response
-        role: user.role,
+      statusCode: HttpStatus.OK,
+      message: 'Login successful',
+      data: {
+        access_token: token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       },
     };
   }

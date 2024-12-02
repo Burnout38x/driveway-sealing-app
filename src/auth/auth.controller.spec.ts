@@ -24,15 +24,22 @@ describe('AuthController', () => {
 
   it('should register a user', async () => {
     const result = {
-        id: 1,
-        email: 'user@example.com',
-        name: 'Test User',
-        role: 'client',  // or 'contractor'
-        password: 'password123',  // Add the missing field
-      };
-      
+      id: 1,
+      email: 'user@example.com',
+      name: 'Test User',
+      role: 'client', // or 'contractor'
+      password: 'password123', // Add the missing field
+    };
+
     jest.spyOn(service, 'register').mockResolvedValue(result);
-    expect(await controller.register({ email: 'user@example.com', password: 'password123', name: 'Test User', role: 'client' })).toEqual(result);
+    expect(
+      await controller.register({
+        email: 'user@example.com',
+        password: 'password123',
+        name: 'Test User',
+        role: 'client',
+      }),
+    ).toEqual(result);
   });
 
   it('should login a user', async () => {
@@ -47,6 +54,11 @@ describe('AuthController', () => {
       },
     };
     jest.spyOn(service, 'login').mockResolvedValue(result);
-    expect(await controller.login({ email: 'user@example.com', password: 'password123' })).toEqual(result);
+    expect(
+      await controller.login({
+        email: 'user@example.com',
+        password: 'password123',
+      }),
+    ).toEqual(result);
   });
 });

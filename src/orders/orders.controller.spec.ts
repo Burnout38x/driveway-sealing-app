@@ -35,7 +35,7 @@ describe('OrdersController (e2e)', () => {
 
   it('should get all orders for a contractor', async () => {
     const response = await request(app.getHttpServer())
-      .get('/orders/1')  // Assuming contractorId = 1
+      .get('/orders/1') // Assuming contractorId = 1
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
