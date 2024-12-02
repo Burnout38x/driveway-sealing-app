@@ -53,6 +53,7 @@ async function bootstrap() {
       allowedHeaders: 'Content-Type,Authorization,Accept ,X-Requested-With',
       credentials: true,
       preflightContinue: false,
+      exposedHeaders: ['Access-Control-Allow-Origin', 'Access-Control-Allow-Methods', 'Access-Control-Allow-Headers'],
     });
 
   // // Apply the JWT Guard globally
