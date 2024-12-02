@@ -52,6 +52,7 @@ async function bootstrap() {
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       allowedHeaders: 'Content-Type,Authorization,Accept ,X-Requested-With',
       credentials: true,
+      preflightContinue: false,
     });
 
   // // Apply the JWT Guard globally
