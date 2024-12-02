@@ -50,7 +50,7 @@ async function bootstrap() {
         }
       },
       methods: ['GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'],
-      allowedHeaders: ['Content-Type,Authorization,Accept ,X-Requested-With'],
+      allowedHeaders: ['Content-Type,Authorization,Accept ,X-Requested-With','Access-Control-Allow-Origin'],
       credentials: true,
       preflightContinue: false,
       exposedHeaders: ['Access-Control-Allow-Origin', 'Access-Control-Allow-Methods', 'Access-Control-Allow-Headers'],
